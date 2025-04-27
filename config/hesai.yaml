@@ -12,7 +12,7 @@
             cut_frame: true
             cut_frame_num: 3 # must be positive integer
             orig_odom_freq: 10
-            mean_acc_norm: 9.8 # 1: for livox built-in IMU
+            mean_acc_norm: 1.0 # 1: for livox built-in IMU
             online_refine_time: 10.0
             data_accum_length: 500.0
             Rot_LI_cov: [0.05, 0.05, 0.05]

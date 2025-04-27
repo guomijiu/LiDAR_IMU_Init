@@ -650,15 +650,15 @@ void publish_frame_world(rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::Share
     *pcl_wait_save += *laserCloudWorld;
     static int scan_wait_num = 0;
     scan_wait_num++;
-    if (pcl_wait_save->size() > 0 && pcd_save_interval > 0 && scan_wait_num >= pcd_save_interval)
-    {
-      pcd_index++;
-      all_points_dir = string(root_dir + "/PCD/PCD") + to_string(pcd_index) + string(".pcd");
-      cout << "current scan saved to " << all_points_dir << endl;
-      pcd_writer.writeBinary(all_points_dir, *pcl_wait_save);
-      pcl_wait_save->clear();
-      scan_wait_num = 0;
-    }
+    // if (pcl_wait_save->size() > 0 && pcd_save_interval > 0 && scan_wait_num >= pcd_save_interval)
+    // {
+    //   pcd_index++;
+    //   all_points_dir = string(root_dir + "/PCD/PCD") + to_string(pcd_index) + string(".pcd");
+    //   cout << "current scan saved to " << all_points_dir << endl;
+    //   pcd_writer.writeBinary(all_points_dir, *pcl_wait_save);
+    //   pcl_wait_save->clear();
+    //   scan_wait_num = 0;
+    // }
   }
 }
 
