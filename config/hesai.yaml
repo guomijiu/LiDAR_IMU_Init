@@ -1,0 +1,35 @@
+/**:
+    ros__parameters:
+        common:
+            lid_topic: "/sensing/lidar/top/pointcloud"
+            imu_topic: "/localization/imu_data"
+        preprocess:
+            lidar_type: 1                # Robosense LiDAR
+            scan_line: 128
+            blind: 3.0
+            feature_extract_en: false
+        initialization:
+            cut_frame: true
+            cut_frame_num: 3 # must be positive integer
+            orig_odom_freq: 10
+            mean_acc_norm: 9.8 # 1: for livox built-in IMU
+            online_refine_time: 10.0
+            data_accum_length: 500.0
+            Rot_LI_cov: [0.05, 0.05, 0.05]
+            Trans_LI_cov: [0.1, 0.1, 0.1]
+        mapping:
+            filter_size_surf: 0.3
+            filter_size_map: 0.3
+            gyr_cov: 0.1
+            acc_cov: 0.1
+            b_acc_cov: 0.0001
+            b_gyr_cov: 0.0001
+            det_range: 80.0
+        publish:
+            path_en: true
+            scan_publish_en: true #false: close all the point cloud ou
+            dense_publish_en: true #false: low down the points number in a
+            scan_bodyframe_pub_en: true #true: output the point clo
+        pcd_save:
+            pcd_save_en: true
+            interval: 100
