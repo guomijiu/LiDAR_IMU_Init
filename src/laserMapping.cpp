@@ -93,7 +93,7 @@ bool runtime_pos_log = false, pcd_save_en = false, extrinsic_est_en = true, path
 // LI-Init Parameters
 bool cut_frame = true, data_accum_finished = false, data_accum_start = false, online_calib_finish = false, refine_print = false;
 int cut_frame_num = 1, orig_odom_freq = 10, frame_num = 0;
-double time_lag_IMU_wtr_lidar = 0.0, move_start_time = 0.0, online_calib_starts_time = 0.0, mean_acc_norm = 9.81;
+double time_lag_IMU_wtr_lidar = 0.0, move_start_time = 0.0, online_calib_starts_time = 0.0, mean_acc_norm = 9.7892;
 double online_refine_time = 20.0; // unit: s
 vector<double> Trans_LI_cov(3, 0.0005);
 vector<double> Rot_LI_cov(3, 0.00005);
@@ -369,6 +369,7 @@ void standard_pcl_cbk(const sensor_msgs::msg::PointCloud2::UniquePtr &msg)
     timediff_set_flg = true;
     timediff_imu_wrt_lidar = last_timestamp_imu - last_timestamp_lidar;
     printf("Self sync IMU and LiDAR, HARD time lag is %.10lf \n \n", timediff_imu_wrt_lidar);
+    timediff_imu_wrt_lidar= 0;
   }
 
   if ((lidar_type == HESAI || lidar_type == VELO || lidar_type == OUSTER || lidar_type == PANDAR || lidar_type == ROBOSENSE) && cut_frame)
@@ -431,7 +432,7 @@ void imu_cbk(const sensor_msgs::msg::Imu &msg_in)
   sensor_msgs::msg::Imu::SharedPtr msg(new sensor_msgs::msg::Imu(msg_in));
 
   // IMU Time Compensation
-  msg->header.stamp = get_ros_time(rclcpp::Time(msg->header.stamp).seconds() - timediff_imu_wrt_lidar - time_lag_IMU_wtr_lidar);
+  msg->header.stamp = get_ros_time(rclcpp::Time(msg->header.stamp).seconds());
   double timestamp = rclcpp::Time(msg->header.stamp).seconds();
 
   if (timestamp < last_timestamp_imu)
@@ -441,9 +442,9 @@ void imu_cbk(const sensor_msgs::msg::Imu &msg_in)
     Init_LI->IMU_buffer_clear();
   }
 
-  msg->linear_acceleration.x = msg_in.linear_acceleration.x * 9.80;  // 前向
-  msg->linear_acceleration.y = -msg_in.linear_acceleration.y * 9.80; // 左向
-  msg->linear_acceleration.z = -msg_in.linear_acceleration.z * 9.80; // 上向
+  msg->linear_acceleration.x = msg_in.linear_acceleration.x * 9.7892;  // 前向
+  msg->linear_acceleration.y = -msg_in.linear_acceleration.y * 9.7892; // 左向
+  msg->linear_acceleration.z = -msg_in.linear_acceleration.z * 9.7892; // 上向
   msg->angular_velocity.x = (msg_in.angular_velocity.x) * M_PI / 180.0;
   msg->angular_velocity.y = (-msg_in.angular_velocity.y) * M_PI / 180.0;
   msg->angular_velocity.z = (-msg_in.angular_velocity.z) * M_PI / 180.0;
@@ -847,7 +848,7 @@ int main(int argc, char **argv)
   node->declare_parameter<int>("initialization.cut_frame_num", 1);
   node->declare_parameter<int>("initialization.orig_odom_freq", 10);
   node->declare_parameter<double>("initialization.online_refine_time", 20.0);
-  node->declare_parameter<double>("initialization.mean_acc_norm", 9.81);
+  node->declare_parameter<double>("initialization.mean_acc_norm", 9.7892);
   node->declare_parameter<double>("initialization.data_accum_length", 300);
   node->declare_parameter<vector<double>>("initialization.Rot_LI_cov", vector<double>());
   node->declare_parameter<vector<double>>("initialization.Trans_LI_cov", vector<double>());
@@ -881,7 +882,7 @@ int main(int argc, char **argv)
   node->get_parameter_or<int>("initialization.cut_frame_num", cut_frame_num, 1);
   node->get_parameter_or<int>("initialization.orig_odom_freq", orig_odom_freq, 10);
   node->get_parameter_or<double>("initialization.online_refine_time", online_refine_time, 20.0);
-  node->get_parameter_or<double>("initialization.mean_acc_norm", mean_acc_norm, 9.81);
+  node->get_parameter_or<double>("initialization.mean_acc_norm", mean_acc_norm, 9.7892);
   node->get_parameter_or<double>("initialization.data_accum_length", Init_LI->data_accum_length, 300);
   node->get_parameter_or<vector<double>>("initialization.Rot_LI_cov", Rot_LI_cov, vector<double>());
   node->get_parameter_or<vector<double>>("initialization.Trans_LI_cov", Trans_LI_cov, vector<double>());
@@ -1250,12 +1251,13 @@ int main(int argc, char **argv)
       fout_out << euler_cur.transpose() * 57.3 << " " << state.pos_end.transpose() << " "
                << ext_euler.transpose() * 57.3 << " "
                << state.offset_T_L_I.transpose() << " " << state.vel_end.transpose() << " "
-               << " " << state.bias_g.transpose() << " " << state.bias_a.transpose() * 0.9822 / 9.81 << " "
+               << " " << state.bias_g.transpose() << " " << state.bias_a.transpose() * 0.9822 / 9.7892 << " "
                << state.gravity.transpose() << " " << total_distance << endl;
 
       // Broadcast every second
       if (imu_en && frame_num % orig_odom_freq * cut_frame_num == 0 && !online_calib_finish)
       {
+        exit(0);
         double online_calib_completeness = lidar_end_time - online_calib_starts_time;
         online_calib_completeness =
             online_calib_completeness < online_refine_time ? online_calib_completeness : online_refine_time;
@@ -1306,11 +1308,11 @@ int main(int argc, char **argv)
           if (lidar_type != AVIA)
             cut_frame_num = 2;
 
-          time_lag_IMU_wtr_lidar = Init_LI->get_total_time_lag(); // Compensate IMU's time in the buffer
-          for (int i = 0; i < imu_buffer.size(); i++)
-          {
-            imu_buffer[i]->header.stamp = get_ros_time(rclcpp::Time(imu_buffer[i]->header.stamp).seconds() - time_lag_IMU_wtr_lidar);
-          }
+          //time_lag_IMU_wtr_lidar = Init_LI->get_total_time_lag(); // Compensate IMU's time in the buffer
+          // for (int i = 0; i < imu_buffer.size(); i++)
+          // {
+          //   imu_buffer[i]->header.stamp = get_ros_time(rclcpp::Time(imu_buffer[i]->header.stamp).seconds() - time_lag_IMU_wtr_lidar);
+          // }
 
           p_imu->imu_en = imu_en;
           p_imu->LI_init_done = true;

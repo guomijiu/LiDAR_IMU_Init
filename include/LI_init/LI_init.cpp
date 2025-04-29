@@ -372,6 +372,13 @@ void LI_Init::solve_Rotation_only()
                                  nullptr,
                                  R_LI_quat);
   }
+
+  for (int index = 1; index < 4; ++index)
+  {
+    problem_rot.SetParameterUpperBound(R_LI_quat, index, 0.1);
+    problem_rot.SetParameterLowerBound(R_LI_quat, index, -0.1);
+  }
+
   ceres::Solver::Options options_quat;
   ceres::Solver::Summary summary_quat;
   ceres::Solve(options_quat, &problem_rot, &summary_quat);
@@ -637,7 +644,7 @@ void LI_Init::clear()
 void LI_Init::LI_Initialization(int &orig_odom_freq, int &cut_frame_num, double &timediff_imu_wrt_lidar,
                                 const double &move_start_time)
 {
-
+  timediff_imu_wrt_lidar = 0;
   TimeConsuming time("Batch optimization");
 
   downsample_interpolate_IMU(move_start_time);
@@ -653,8 +660,8 @@ void LI_Init::LI_Initialization(int &orig_odom_freq, int &cut_frame_num, double 
   set_Lidar_state(Lidar_after_zero_phase);
   cut_sequence_tail();
 
-  xcorr_temporal_init(orig_odom_freq * cut_frame_num);
-  IMU_time_compensate(get_lag_time_1(), false);
+  //xcorr_temporal_init(orig_odom_freq * cut_frame_num);
+  //IMU_time_compensate(get_lag_time_1(), false);
 
   central_diff();
 
@@ -666,7 +673,7 @@ void LI_Init::LI_Initialization(int &orig_odom_freq, int &cut_frame_num, double 
 
   solve_Rotation_only();
 
-  solve_Rot_bias_gyro(timediff_imu_wrt_lidar);
+  //solve_Rot_bias_gyro(timediff_imu_wrt_lidar);
 
   acc_interpolate();
 
