@@ -7,7 +7,9 @@
       },
       "includePath": [
         "/opt/ros/humble/include/**",
-        "/home/jimu/fast_lio_ws/src/LiDAR_IMU_Init/include/**",
+        "/home/jimu/jimu_autoware_map_create/src/jimu_ins_localization/include/**",
+        "/home/jimu/jimu_autoware_map_create/src/jimu_lidar_imu_init/include/**",
+        "/home/jimu/jimu_autoware_map_create/src/jimu_lio/include/**",
         "/usr/include/**"
       ],
       "name": "ROS",

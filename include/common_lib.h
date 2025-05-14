@@ -6,8 +6,8 @@
 #include <Eigen/Eigen>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
-#include <lidar_imu_init/msg/states.hpp>
-#include <lidar_imu_init/msg/pose6_d.hpp>
+#include <jimu_lidar_imu_init/msg/states.hpp>
+#include <jimu_lidar_imu_init/msg/pose6_d.hpp>
 #include <sensor_msgs/msg/imu.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <tf2_ros/buffer.h>
@@ -36,7 +36,7 @@ using namespace Eigen;
 #define DEBUG_FILE_DIR(name) (string(string(ROOT_DIR) + "Log/" + name))
 #define RESULT_FILE_DIR(name) (string(string(ROOT_DIR) + "result/" + name))
 
-typedef lidar_imu_init::msg::Pose6D Pose6D;
+typedef jimu_lidar_imu_init::msg::Pose6D Pose6D;
 typedef pcl::PointXYZINormal PointType;
 typedef pcl::PointXYZRGB PointTypeRGB;
 typedef pcl::PointCloud<PointType> PointCloudXYZI;

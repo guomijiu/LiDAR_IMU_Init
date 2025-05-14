@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(lidar_imu_init)
+project(jimu_lidar_imu_init)
 
 SET(CMAKE_BUILD_TYPE "Release")
 

@@ -11,7 +11,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    package_path = get_package_share_directory('lidar_imu_init')
+    package_path = get_package_share_directory('jimu_lidar_imu_init')
     default_config_path = os.path.join(package_path, 'config')
     default_rviz_config_path = os.path.join(
         package_path, 'rviz', 'spinning.rviz')
@@ -44,7 +44,7 @@ def generate_launch_description():
     )
 
     li_init_node = Node(
-        package='lidar_imu_init',
+        package='jimu_lidar_imu_init',
         executable='li_init',
         parameters=[PathJoinSubstitution([config_path, config_file]),
                     {'use_sim_time': use_sim_time}],
